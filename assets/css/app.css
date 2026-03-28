@@ -1,0 +1,8 @@
+﻿#map {
+    min-height: 360px;
+    border-radius: 0.75rem;
+}
+
+.hero-gradient {
+    background: linear-gradient(120deg, #0f172a 0%, #1e3a8a 50%, #0f766e 100%);
+}
