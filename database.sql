@@ -1,10 +1,14 @@
-﻿CREATE DATABASE IF NOT EXISTS village_traveler CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS village_traveler CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE village_traveler;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(190) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+    role ENUM('admin','user') NOT NULL DEFAULT 'user',
+    reset_token_hash CHAR(64) DEFAULT NULL,
+    reset_token_expires_at DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -27,9 +31,34 @@ CREATE TABLE IF NOT EXISTS attractions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO users (username, password_hash)
-VALUES ('admin', '$2y$10$QNeckYAE8k1RVmKfDq2ra.kXbKp0aZ0rGdv7k0PtY/3flYoV.J8Ku')
-ON DUPLICATE KEY UPDATE username = VALUES(username);
+CREATE TABLE IF NOT EXISTS trip_plans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    status ENUM('planned','completed') NOT NULL DEFAULT 'planned',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at DATETIME DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS trip_plan_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    trip_plan_id INT NOT NULL,
+    attraction_id INT NOT NULL,
+    visit_order INT NOT NULL,
+    is_visited TINYINT(1) NOT NULL DEFAULT 0,
+    visited_at DATETIME DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (trip_plan_id) REFERENCES trip_plans(id) ON DELETE CASCADE,
+    FOREIGN KEY (attraction_id) REFERENCES attractions(id) ON DELETE CASCADE
+);
+
+INSERT INTO users (username, email, password_hash, role)
+VALUES ('admin', 'info.itzone.sl@gmail.com', '$2y$10$QNeckYAE8k1RVmKfDq2ra.kXbKp0aZ0rGdv7k0PtY/3flYoV.J8Ku', 'admin')
+ON DUPLICATE KEY UPDATE
+    username = VALUES(username),
+    email = VALUES(email),
+    role = VALUES(role);
 
 INSERT INTO attractions (category, name_en, name_si, short_en, short_si, description_en, description_si, open_hours, entry_fee_lkr, latitude, longitude, image_url)
 VALUES

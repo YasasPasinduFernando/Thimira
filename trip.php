@@ -5,6 +5,8 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/functions.php';
 
 $appLang = lang();
+require_login_for_discovery_pages();
+
 $lat = currentLat();
 $lng = currentLng();
 $title = 'One-Day Trip Planner';
@@ -23,45 +25,55 @@ $trip = array_slice(array_filter($rows, static fn(array $r): bool => $r['distanc
 $startTime = new DateTimeImmutable('08:00');
 require_once __DIR__ . '/includes/header.php';
 ?>
-<section class="bg-white p-6 rounded-xl shadow">
-    <h1 class="text-2xl font-bold mb-2"><?= esc($title) ?></h1>
-    <p class="text-slate-600 mb-4">Auto-generated route using nearest attractions from your current location.</p>
+<section class="surface-card border border-slate-100 p-6 md:p-8">
+    <div class="mb-6 flex flex-col gap-4 border-b border-slate-100 pb-6 md:flex-row md:items-end md:justify-between">
+        <div>
+            <h1 class="font-display text-2xl font-bold text-slate-900 md:text-3xl"><?= esc($title) ?></h1>
+            <p class="mt-2 max-w-xl text-sm text-slate-600">Auto-generated route using the nearest attractions from your current location.</p>
+        </div>
+        <?php if (isUserLoggedIn()): ?>
+            <div class="flex flex-wrap gap-2">
+                <a href="<?= esc(url('trip-create.php')) ?>" class="inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-slate-800">Personal trip plan</a>
+                <a href="<?= esc(url('my-trips.php')) ?>" class="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-village-300">My trips</a>
+            </div>
+        <?php endif; ?>
+    </div>
 
-    <button id="use-my-location" class="mb-5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-semibold px-4 py-2 rounded-lg">Rebuild Using My Live Location</button>
+    <button type="button" id="use-my-location" class="mb-6 inline-flex rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-5 py-3 text-sm font-bold text-slate-900 shadow-lg shadow-amber-500/20 transition hover:from-amber-300 hover:to-amber-400">Rebuild using my live location</button>
 
     <?php if (!$trip): ?>
-        <p>No route available in 25km radius.</p>
+        <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 p-8 text-center text-slate-600">No route available within a 25 km radius.</div>
     <?php else: ?>
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm border border-slate-200">
-                <thead class="bg-slate-100">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 shadow-soft">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gradient-to-r from-slate-50 to-teal-50/50">
                     <tr>
-                        <th class="p-2 text-left">#</th>
-                        <th class="p-2 text-left">Place</th>
-                        <th class="p-2 text-left">Distance</th>
-                        <th class="p-2 text-left">Arrival</th>
+                        <th class="p-4 text-left font-display font-semibold text-slate-700">#</th>
+                        <th class="p-4 text-left font-display font-semibold text-slate-700">Place</th>
+                        <th class="p-4 text-left font-display font-semibold text-slate-700">Distance</th>
+                        <th class="p-4 text-left font-display font-semibold text-slate-700">Arrival</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100 bg-white">
                     <?php foreach ($trip as $i => $stop): ?>
                         <?php
                             $name = $appLang === 'si' ? $stop['name_si'] : $stop['name_en'];
                             $arrival = $startTime->modify('+' . (string) ($i * 90) . ' minutes')->format('H:i');
                         ?>
-                        <tr class="border-t border-slate-200">
-                            <td class="p-2"><?= (int) ($i + 1) ?></td>
-                            <td class="p-2"><?= esc($name) ?></td>
-                            <td class="p-2"><?= esc(number_format((float) $stop['distance_km'], 2)) ?> km</td>
-                            <td class="p-2"><?= esc($arrival) ?></td>
+                        <tr class="transition hover:bg-teal-50/30">
+                            <td class="p-4 font-medium text-slate-500"><?= (int) ($i + 1) ?></td>
+                            <td class="p-4 font-semibold text-slate-900"><?= esc($name) ?></td>
+                            <td class="p-4 text-slate-600"><?= esc(number_format((float) $stop['distance_km'], 2)) ?> km</td>
+                            <td class="p-4"><span class="rounded-lg bg-village-100 px-2.5 py-1 text-xs font-bold text-village-800"><?= esc($arrival) ?></span></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
 
-        <div id="map" class="mt-5"></div>
+        <div id="map" class="mt-6"></div>
 
-        <a class="inline-block mt-4 px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin=<?= esc((string) $lat) ?>,<?= esc((string) $lng) ?>&destination=<?= esc((string) $trip[count($trip)-1]['latitude']) ?>,<?= esc((string) $trip[count($trip)-1]['longitude']) ?>&travelmode=driving">Open Route in Google Maps</a>
+        <a class="mt-6 inline-flex items-center gap-2 rounded-2xl bg-village-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&origin=<?= esc((string) $lat) ?>,<?= esc((string) $lng) ?>&destination=<?= esc((string) $trip[count($trip)-1]['latitude']) ?>,<?= esc((string) $trip[count($trip)-1]['longitude']) ?>&travelmode=driving">Open route in Google Maps</a>
 
         <script>
             const map = L.map('map').setView([<?= esc((string) $lat) ?>, <?= esc((string) $lng) ?>], 11);
@@ -86,7 +98,7 @@ require_once __DIR__ . '/includes/header.php';
                 L.marker([stop.lat, stop.lng]).addTo(map).bindPopup(`${idx + 1}. ${stop.name}`);
             });
 
-            L.polyline(routePoints, {color: 'blue'}).addTo(map);
+            L.polyline(routePoints, {color: '#0d9488', weight: 4, opacity: 0.85}).addTo(map);
         </script>
     <?php endif; ?>
 </section>

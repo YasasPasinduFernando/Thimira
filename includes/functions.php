@@ -3,6 +3,20 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../config/config.php';
 
+if (!function_exists('str_contains')) {
+    function str_contains(string $haystack, string $needle): bool
+    {
+        return $needle === '' || strpos($haystack, $needle) !== false;
+    }
+}
+
+if (!function_exists('str_starts_with')) {
+    function str_starts_with(string $haystack, string $needle): bool
+    {
+        return $needle === '' || strncmp($haystack, $needle, strlen($needle)) === 0;
+    }
+}
+
 function appBaseUrl(): string
 {
     return APP_BASE_URL;
@@ -98,4 +112,79 @@ function getFlash(): ?array
     unset($_SESSION['flash']);
 
     return $flash;
+}
+
+function isUserLoggedIn(): bool
+{
+    return isset($_SESSION['user_id']);
+}
+
+function currentUser(): ?array
+{
+    if (!isUserLoggedIn()) {
+        return null;
+    }
+
+    return [
+        'id' => (int) $_SESSION['user_id'],
+        'username' => (string) $_SESSION['user_username'],
+    ];
+}
+
+function requireUser(): void
+{
+    if (!isUserLoggedIn()) {
+        header('Location: ' . url('login.php'));
+        exit;
+    }
+}
+
+/** Allowed targets after login (?next=). Prevents open redirects. */
+function safe_login_next(string $raw): ?string
+{
+    $raw = trim($raw);
+    if ($raw === '') {
+        return null;
+    }
+    if (str_contains($raw, '..') || str_contains($raw, "\n") || str_contains($raw, "\r")) {
+        return null;
+    }
+    if (preg_match('#^https?://#i', $raw) || str_starts_with($raw, '//')) {
+        return null;
+    }
+    $pathPart = explode('?', $raw, 2)[0];
+    $base = basename(str_replace('\\', '/', $pathPart));
+    $allowed = ['attractions.php', 'trip.php', 'attraction.php'];
+    if (!in_array($base, $allowed, true)) {
+        return null;
+    }
+
+    return $raw;
+}
+
+function login_url_with_next(string $targetPathWithQuery): string
+{
+    $next = safe_login_next($targetPathWithQuery);
+    if ($next === null) {
+        return url('login.php');
+    }
+
+    return url('login.php') . '?next=' . rawurlencode($next);
+}
+
+/** Guests cannot open map / trip discovery (avoids DB errors and matches product rule). */
+function require_login_for_discovery_pages(): void
+{
+    if (isUserLoggedIn()) {
+        return;
+    }
+    $script = basename(str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '')));
+    $allowedScripts = ['attractions.php', 'trip.php', 'attraction.php'];
+    if (!in_array($script, $allowedScripts, true)) {
+        return;
+    }
+    $qs = (string) ($_SERVER['QUERY_STRING'] ?? '');
+    $next = $script . ($qs !== '' ? '?' . $qs : '');
+    header('Location: ' . login_url_with_next($next));
+    exit;
 }

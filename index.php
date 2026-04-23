@@ -5,108 +5,98 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/functions.php';
 
 $appLang = lang();
-$lat = currentLat();
-$lng = currentLng();
-$title = t(['en' => 'Attractions Near You', 'si' => 'Attractions Near You'], $appLang);
+$title = 'Village Traveler - Home';
+$isLoggedIn = isUserLoggedIn();
+$username = (string) ($_SESSION['user_username'] ?? '');
 
-$stmt = db()->query('SELECT * FROM attractions WHERE is_active = 1');
-$rows = $stmt->fetchAll();
-
-$attractions = [];
-foreach ($rows as $row) {
-    $distance = distanceKm($lat, $lng, (float) $row['latitude'], (float) $row['longitude']);
-    $row['distance_km'] = $distance;
-    if ($distance <= MAX_RADIUS_KM) {
-        $attractions[] = $row;
-    }
-}
-
-usort($attractions, static fn(array $a, array $b): int => $a['distance_km'] <=> $b['distance_km']);
+$homeNavQ = http_build_query(['lang' => $appLang]);
+$homeAttrHref = $isLoggedIn
+    ? esc(url('attractions.php')) . '?' . esc($homeNavQ)
+    : esc(login_url_with_next('attractions.php?' . $homeNavQ));
+$homeTripHref = $isLoggedIn
+    ? esc(url('trip.php')) . '?' . esc($homeNavQ)
+    : esc(login_url_with_next('trip.php?' . $homeNavQ));
 
 require_once __DIR__ . '/includes/header.php';
 ?>
-<section class="hero-gradient text-white rounded-xl p-6 mb-6">
-    <h1 class="text-2xl md:text-3xl font-bold mb-2"><?= esc($title) ?></h1>
-    <p class="text-slate-100 mb-4">Discover places within 25 km of your location.</p>
-    <div class="flex flex-wrap gap-3">
-        <button id="use-my-location" class="bg-amber-400 hover:bg-amber-300 text-slate-900 font-semibold px-4 py-2 rounded-lg">Use My Live Location</button>
-        <a href="https://maps.app.goo.gl/XpPW8HxJxcbdj1Zj6" target="_blank" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg">Open Given Location</a>
+<section class="hero-gradient relative mb-10 overflow-hidden rounded-3xl p-8 text-white md:p-14">
+    <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-teal-400/20 blur-3xl"></div>
+    <div class="absolute -bottom-16 left-1/4 h-48 w-48 rounded-full bg-amber-400/15 blur-3xl"></div>
+    <p class="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-teal-100 ring-1 ring-white/20">
+        <span class="h-1.5 w-1.5 rounded-full bg-teal-300"></span>
+        <?= esc(t(['en' => 'Local discovery', 'si' => 'දේශීය සොයාගැනීම'], $appLang)) ?>
+    </p>
+    <h1 class="font-display text-3xl font-extrabold leading-tight tracking-tight md:text-5xl md:leading-tight">
+        <?= esc(t(['en' => 'Explore local attractions, smarter', 'si' => 'ස්ථාන සොයන්න, වඩා හොඳින්'], $appLang)) ?>
+    </h1>
+    <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-200/95 md:text-lg">
+        <?= esc(t([
+            'en' => 'Plan one-day trips, discover nearby places within 25 km, and navigate with distance-aware guidance from your location.',
+            'si' => 'එක් දින චාරිකා සැලසුම් කරන්න, කිලෝමීටර් 25 තුළ ස්ථාන සොයා ගන්න, සහ ඔබේ ස්ථානයෙන් දුර පදනම්ව මාර්ගොපදේශ ලබා ගන්න.',
+        ], $appLang)) ?>
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+        <a href="<?= $homeAttrHref ?>" class="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-6 py-3.5 text-sm font-bold text-slate-900 shadow-lg shadow-amber-500/25 transition hover:from-amber-300 hover:to-amber-400">
+            <?= esc(t(['en' => 'Browse attractions', 'si' => 'ස්ථාන බලන්න'], $appLang)) ?>
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+        <a href="<?= $homeTripHref ?>" class="inline-flex items-center rounded-2xl border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20">
+            <?= esc(t(['en' => 'One-day trip planner', 'si' => 'එක් දින සැලසුම'], $appLang)) ?>
+        </a>
     </div>
 </section>
 
-<section class="grid md:grid-cols-2 gap-6">
-    <div class="bg-white p-4 rounded-xl shadow">
-        <h2 class="text-lg font-semibold mb-2">Map View</h2>
-        <div id="map"></div>
-        <p class="mt-3 text-sm text-slate-600">Reference location: <?= esc(number_format($lat, 6)) ?>, <?= esc(number_format($lng, 6)) ?></p>
-    </div>
+<?php if ($isLoggedIn): ?>
+    <section class="surface-card mb-10 border border-emerald-200/60 bg-gradient-to-br from-emerald-50/90 to-teal-50/50 p-6 md:p-8">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold text-emerald-800"><?= esc(t(['en' => 'Welcome back', 'si' => 'නැවත සාදරයෙන් පිළිගනිමු'], $appLang)) ?></p>
+                <p class="mt-1 font-display text-xl font-bold text-slate-900"><?= esc($username) ?></p>
+                <p class="mt-2 text-sm text-slate-600"><?= esc(t(['en' => 'Continue from attractions or open your trip plans.', 'si' => 'ස්ථාන හෝ ඔබේ චාරිකා සැලසුම් වෙත යන්න.'], $appLang)) ?></p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <a href="<?= esc(url('attractions.php')) ?>?lang=<?= esc($appLang) ?>" class="inline-flex rounded-xl bg-village-600 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700"><?= esc(t(['en' => 'Attractions', 'si' => 'ස්ථාන'], $appLang)) ?></a>
+                <a href="<?= esc(url('my-trips.php')) ?>" class="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-village-300 hover:text-village-800">My Trips</a>
+            </div>
+        </div>
+    </section>
+<?php else: ?>
+    <section class="mb-10 grid gap-6 md:grid-cols-2">
+        <article class="surface-card group border border-slate-100 p-8 transition hover:shadow-card">
+            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-village-400 to-village-600 text-white shadow-glow">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+            </div>
+            <h2 class="font-display text-xl font-bold text-slate-900">New here?</h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">Create an account to save trip plans, track visits, and get trip summary emails.</p>
+            <a href="<?= esc(url('register.php')) ?>" class="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">Register</a>
+        </article>
+        <article class="surface-card group border border-slate-100 p-8 transition hover:shadow-card">
+            <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-village-700 text-white shadow-soft">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+            </div>
+            <h2 class="font-display text-xl font-bold text-slate-900">Already have an account?</h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">Sign in to continue exploring attractions and managing your trips.</p>
+            <a href="<?= esc(url('login.php')) ?>" class="mt-6 inline-flex rounded-xl bg-village-600 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700">Login</a>
+        </article>
+    </section>
+<?php endif; ?>
 
-    <div class="space-y-4">
-        <?php if (!$attractions): ?>
-            <div class="bg-white p-4 rounded-xl shadow">No attractions found within 25 km.</div>
-        <?php endif; ?>
-
-        <?php foreach ($attractions as $place): ?>
-            <?php
-                $name = $appLang === 'si' ? $place['name_si'] : $place['name_en'];
-                $short = $appLang === 'si' ? $place['short_si'] : $place['short_en'];
-                $distance = number_format((float) $place['distance_km'], 2);
-            ?>
-            <article class="bg-white p-4 rounded-xl shadow">
-                <div class="flex items-start justify-between gap-3">
-                    <div>
-                        <h3 class="text-lg font-semibold"><?= esc($name) ?></h3>
-                        <p class="text-sm text-slate-500"><?= esc($place['category']) ?></p>
-                    </div>
-                    <span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full"><?= esc($distance) ?> km</span>
-                </div>
-                <p class="mt-2 text-sm text-slate-700"><?= esc($short) ?></p>
-                <a class="inline-block mt-3 text-blue-700 hover:underline" href="<?= esc(url('attraction.php')) ?>?id=<?= (int) $place['id'] ?>&lang=<?= esc($appLang) ?>&lat=<?= esc((string) $lat) ?>&lng=<?= esc((string) $lng) ?>">View Details</a>
-            </article>
-        <?php endforeach; ?>
-    </div>
+<section class="grid gap-6 md:grid-cols-3">
+    <article class="surface-card border border-slate-100 p-7 transition hover:-translate-y-0.5 hover:shadow-card">
+        <div class="mb-4 text-2xl" aria-hidden="true">📍</div>
+        <h3 class="font-display text-lg font-bold text-slate-900">Location based</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Find attractions within a 25 km radius from live or default coordinates.</p>
+    </article>
+    <article class="surface-card border border-slate-100 p-7 transition hover:-translate-y-0.5 hover:shadow-card">
+        <div class="mb-4 text-2xl" aria-hidden="true">🌐</div>
+        <h3 class="font-display text-lg font-bold text-slate-900">Bilingual</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Switch English / Sinhala for comfortable reading on every page.</p>
+    </article>
+    <article class="surface-card border border-slate-100 p-7 transition hover:-translate-y-0.5 hover:shadow-card">
+        <div class="mb-4 text-2xl" aria-hidden="true">🗺️</div>
+        <h3 class="font-display text-lg font-bold text-slate-900">Trip planner</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Auto-build a one-day route with map view and Google Maps directions.</p>
+    </article>
 </section>
-
-<script>
-    const currentLat = <?= esc((string) $lat) ?>;
-    const currentLng = <?= esc((string) $lng) ?>;
-    const homeLat = <?= esc((string) DEFAULT_LAT) ?>;
-    const homeLng = <?= esc((string) DEFAULT_LNG) ?>;
-
-    const map = L.map('map').setView([currentLat, currentLng], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    const redIcon = new L.Icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-    });
-
-    L.marker([homeLat, homeLng], { icon: redIcon }).addTo(map).bindPopup('Home Location (Red Pin)');
-
-    if (Math.abs(currentLat - homeLat) > 0.00001 || Math.abs(currentLng - homeLng) > 0.00001) {
-        L.marker([currentLat, currentLng]).addTo(map).bindPopup('Your Current Location');
-    }
-
-    const attractions = <?= json_encode(array_map(static function (array $row) use ($appLang): array {
-        return [
-            'name' => $appLang === 'si' ? $row['name_si'] : $row['name_en'],
-            'lat' => (float) $row['latitude'],
-            'lng' => (float) $row['longitude'],
-            'id' => (int) $row['id'],
-        ];
-    }, $attractions), JSON_UNESCAPED_UNICODE) ?>;
-
-    attractions.forEach((item) => {
-        L.marker([item.lat, item.lng]).addTo(map)
-            .bindPopup(`<strong>${item.name}</strong><br><a href="<?= esc(url('attraction.php')) ?>?id=${item.id}&lang=<?= esc($appLang) ?>&lat=<?= esc((string) $lat) ?>&lng=<?= esc((string) $lng) ?>">Details</a>`);
-    });
-</script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
