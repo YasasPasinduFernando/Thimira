@@ -157,6 +157,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_trip'])) {
     }
 }
 
+$navBackHref = url('my-trips.php') . '?' . http_build_query([
+    'lang' => $appLang,
+    'lat' => currentLat(),
+    'lng' => currentLng(),
+]);
+$navBackText = t(['en' => 'My trips', 'si' => 'මගේ චාරිකා'], $appLang);
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="surface-card border border-slate-100 p-6 md:p-8">
@@ -168,11 +174,16 @@ require_once __DIR__ . '/includes/header.php';
                 'si' => 'සෑම නැවතුමක් සලකුණු කර, සාරාංශ විද්‍යුත් තැපෑල ලබා ගැනීමට සම්පූර්ණ කරන්න. නැවතුම් ඔබේ යොමු ස්ථානයෙන් අඩුම දුර සිට පෙළගස්ව ඇත.',
             ], $appLang)) ?></p>
         </div>
-        <span class="rounded-full px-3 py-1.5 text-xs font-bold <?= $plan['status'] === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' ?>">
-            <?= esc($plan['status'] === 'completed'
-                ? t(['en' => 'COMPLETED', 'si' => 'සම්පූර්ණ'], $appLang)
-                : t(['en' => 'PLANNED', 'si' => 'සැලසුම්'], $appLang)) ?>
-        </span>
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="rounded-full px-3 py-1.5 text-xs font-bold <?= $plan['status'] === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' ?>">
+                <?= esc($plan['status'] === 'completed'
+                    ? t(['en' => 'COMPLETED', 'si' => 'සම්පූර්ණ'], $appLang)
+                    : t(['en' => 'PLANNED', 'si' => 'සැලසුම්'], $appLang)) ?>
+            </span>
+            <?php if ((string) $plan['status'] === 'planned'): ?>
+                <a href="<?= esc(url('trip-edit.php')) ?>?<?= esc(http_build_query(['id' => $tripId, 'lang' => $appLang])) ?>" class="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-800 ring-1 ring-slate-200 transition hover:bg-slate-200"><?= esc(t(['en' => 'Edit plan', 'si' => 'සැලසුම සංස්කරණය'], $appLang)) ?></a>
+            <?php endif; ?>
+        </div>
     </div>
 
     <?php if ($error): ?>
@@ -252,7 +263,6 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-600 sm:text-sm">
                             <span><span class="font-semibold text-slate-700"><?= esc(t(['en' => 'Open', 'si' => 'විවෘත'], $appLang)) ?>:</span> <?= esc((string) $item['open_hours']) ?></span>
                             <span><span class="font-semibold text-slate-700"><?= esc(t(['en' => 'Entry', 'si' => 'ඇතුල්වීම'], $appLang)) ?>:</span> <?= esc(money((float) $item['entry_fee_lkr'])) ?></span>
-                            <span><span class="font-semibold text-slate-700"><?= esc(t(['en' => 'Distance', 'si' => 'දුර'], $appLang)) ?>:</span> <?= esc(number_format((float) $item['distance_km'], 2)) ?> km</span>
                         </div>
                         <a href="<?= esc($detailHref) ?>" class="inline-flex text-sm font-semibold text-village-700 hover:text-village-900 hover:underline"><?= esc(t(['en' => 'View full details', 'si' => 'සම්පූර්ණ විස්තර'], $appLang)) ?> →</a>
                     </div>

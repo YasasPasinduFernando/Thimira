@@ -131,6 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $title = $isEdit ? 'Edit user' : 'Add user';
+$navBackHref = url('admin/users.php');
+$navBackText = t(['en' => 'Users list', 'si' => 'පරිශීලක ලැයිස්තුව'], lang());
 require_once __DIR__ . '/../includes/header.php';
 ?>
 <section class="bg-white p-6 rounded-xl shadow space-y-4 max-w-xl">

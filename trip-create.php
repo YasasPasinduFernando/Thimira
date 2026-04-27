@@ -54,6 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$navBackHref = url('my-trips.php') . '?' . http_build_query(['lang' => $appLang]);
+$navBackText = t(['en' => 'My trips', 'si' => 'මගේ චාරිකා'], $appLang);
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="surface-card mx-auto max-w-3xl border border-slate-100 p-6 md:p-10">

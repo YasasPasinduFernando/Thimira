@@ -15,6 +15,8 @@ $recentStmt = db()->query('SELECT id, name_en, category, is_active, updated_at F
 $recentRows = $recentStmt->fetchAll();
 
 $title = 'Admin Dashboard';
+$navBackHref = url('index.php');
+$navBackText = t(['en' => 'Public site', 'si' => 'ප්‍රසිද්ධ අඩවිය'], lang());
 require_once __DIR__ . '/../includes/header.php';
 ?>
 <section class="space-y-8">

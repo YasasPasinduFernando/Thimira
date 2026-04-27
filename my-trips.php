@@ -22,6 +22,10 @@ $stmt = db()->prepare(
 $stmt->execute(['user_id' => (int) $currentUser['id']]);
 $plans = $stmt->fetchAll();
 
+$flash = getFlash();
+
+$navBackHref = url('index.php') . '?' . http_build_query(['lang' => $appLang]);
+$navBackText = t(['en' => 'Home', 'si' => 'මුල් පිටුව'], $appLang);
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="surface-card border border-slate-100 p-6 md:p-8">
@@ -35,6 +39,12 @@ require_once __DIR__ . '/includes/header.php';
         </div>
         <a href="<?= esc(url('trip-create.php')) ?>" class="inline-flex justify-center rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 px-5 py-3 text-sm font-bold text-white shadow-soft transition hover:from-slate-800 hover:to-slate-900"><?= esc(t(['en' => 'New plan', 'si' => 'නව සැලසුම'], $appLang)) ?></a>
     </div>
+
+    <?php if ($flash): ?>
+        <div class="mb-6 rounded-2xl border p-4 text-sm <?= $flash['type'] === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-900' : 'border-red-200 bg-red-50 text-red-800' ?>">
+            <?= esc((string) $flash['message']) ?>
+        </div>
+    <?php endif; ?>
 
     <?php if (!$plans): ?>
         <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 p-10 text-center text-slate-600"><?= esc(t(['en' => 'You have no trip plans yet.', 'si' => 'ඔබට තවම චාරිකා සැලසුම් නැත.'], $appLang)) ?></div>
@@ -53,12 +63,20 @@ require_once __DIR__ . '/includes/header.php';
                     <p class="mt-2 text-sm text-slate-600">
                         <?= esc(t(['en' => 'Progress:', 'si' => 'ප්‍රගතිය:'], $appLang)) ?> <span class="font-semibold text-slate-900"><?= (int) $plan['visited_places'] ?>/<?= (int) $plan['total_places'] ?></span> <?= esc(t(['en' => 'places visited', 'si' => 'ස්ථාන සංචාර'], $appLang)) ?>
                     </p>
-                    <a class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-village-700 hover:gap-2 hover:text-village-900" href="<?= esc(url('trip-plan.php')) ?>?<?= esc(http_build_query([
-                        'id' => (int) $plan['id'],
-                        'lang' => $appLang,
-                        'lat' => currentLat(),
-                        'lng' => currentLng(),
-                    ])) ?>"><?= esc(t(['en' => 'Open plan', 'si' => 'සැලසුම අරින්න'], $appLang)) ?> <span aria-hidden="true">→</span></a>
+                    <div class="mt-4 flex flex-wrap items-center gap-4">
+                        <a class="inline-flex items-center gap-1 text-sm font-semibold text-village-700 hover:gap-2 hover:text-village-900" href="<?= esc(url('trip-plan.php')) ?>?<?= esc(http_build_query([
+                            'id' => (int) $plan['id'],
+                            'lang' => $appLang,
+                            'lat' => currentLat(),
+                            'lng' => currentLng(),
+                        ])) ?>"><?= esc(t(['en' => 'Open plan', 'si' => 'සැලසුම අරින්න'], $appLang)) ?> <span aria-hidden="true">→</span></a>
+                        <?php if ((string) $plan['status'] === 'planned'): ?>
+                            <a class="inline-flex items-center gap-1 text-sm font-semibold text-slate-700 hover:text-slate-900" href="<?= esc(url('trip-edit.php')) ?>?<?= esc(http_build_query([
+                                'id' => (int) $plan['id'],
+                                'lang' => $appLang,
+                            ])) ?>"><?= esc(t(['en' => 'Edit', 'si' => 'සංස්කරණය'], $appLang)) ?></a>
+                        <?php endif; ?>
+                    </div>
                 </article>
             <?php endforeach; ?>
         </div>

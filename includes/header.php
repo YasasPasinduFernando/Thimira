@@ -103,7 +103,7 @@ $tripNavHref = isUserLoggedIn()
 
                     <?php if (isUserLoggedIn()): ?>
                         <a class="nav-link <?= $currentScript === 'trip-create.php' ? 'nav-link-active' : '' ?>" href="<?= esc(url('trip-create.php')) ?>"><?= esc(t(['en' => 'Create Trip', 'si' => 'සැලසුම සාදන්න'], $appLang)) ?></a>
-                        <a class="nav-link <?= in_array($currentScript, ['my-trips.php', 'trip-plan.php'], true) ? 'nav-link-active' : '' ?>" href="<?= esc(url('my-trips.php')) ?>"><?= esc(t(['en' => 'My Trips', 'si' => 'මගේ චාරිකා'], $appLang)) ?></a>
+                        <a class="nav-link <?= in_array($currentScript, ['my-trips.php', 'trip-plan.php', 'trip-edit.php'], true) ? 'nav-link-active' : '' ?>" href="<?= esc(url('my-trips.php')) ?>"><?= esc(t(['en' => 'My Trips', 'si' => 'මගේ චාරිකා'], $appLang)) ?></a>
                     <?php endif; ?>
 
                     <?php if (show_public_admin_nav()): ?>
@@ -131,4 +131,22 @@ $tripNavHref = isUserLoggedIn()
             </div>
         </div>
     </header>
-    <main class="max-w-6xl mx-auto px-4 py-8 sm:px-6 sm:py-10 <?= esc($mainClass) ?>">
+    <?php
+    $__navBackHref = trim((string) ($navBackHref ?? ''));
+    $__showNavBack = $__navBackHref !== '';
+    $__mainTopPad = $__showNavBack ? 'pt-14 sm:pt-16 ' : '';
+    ?>
+    <main class="relative max-w-6xl mx-auto px-4 py-8 sm:px-6 sm:py-10 <?= $__mainTopPad ?><?= esc($mainClass) ?>">
+        <?php if ($__showNavBack):
+            $__navBackText = trim((string) ($navBackText ?? ''));
+            if ($__navBackText === '') {
+                $__navBackText = t(['en' => 'Back', 'si' => 'ආපසු'], $appLang);
+            }
+        ?>
+        <div class="absolute left-4 top-4 z-20 sm:left-6 sm:top-6">
+            <a href="<?= esc($__navBackHref) ?>" class="inline-flex items-center gap-1.5 rounded-xl bg-white/95 px-3 py-2 text-sm font-semibold text-village-800 shadow-soft ring-1 ring-slate-200/80 backdrop-blur-sm transition hover:bg-village-50 hover:ring-village-200">
+                <span class="text-base leading-none" aria-hidden="true">←</span>
+                <?= esc($__navBackText) ?>
+            </a>
+        </div>
+        <?php endif; ?>

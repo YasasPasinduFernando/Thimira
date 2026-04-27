@@ -25,6 +25,8 @@ foreach ($rows as $row) {
 
 usort($attractions, static fn(array $a, array $b): int => $a['distance_km'] <=> $b['distance_km']);
 
+$navBackHref = url('index.php') . '?' . http_build_query(['lang' => $appLang]);
+$navBackText = t(['en' => 'Home', 'si' => 'මුල් පිටුව'], $appLang);
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="hero-gradient relative mb-8 overflow-hidden rounded-3xl p-6 text-white md:p-10">

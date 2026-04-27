@@ -55,6 +55,8 @@ $rows = $stmt->fetchAll();
 $flash = getFlash();
 
 $title = 'Manage Attractions';
+$navBackHref = url('admin/dashboard.php');
+$navBackText = t(['en' => 'Dashboard', 'si' => 'උපකරණ තීරය'], lang());
 require_once __DIR__ . '/../includes/header.php';
 ?>
 <section class="bg-white p-6 rounded-xl shadow space-y-4">

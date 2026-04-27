@@ -70,6 +70,8 @@ $userTotal = (int) db()->query('SELECT COUNT(*) FROM users')->fetchColumn();
 $flash = getFlash();
 
 $title = 'Manage users';
+$navBackHref = url('admin/dashboard.php');
+$navBackText = t(['en' => 'Dashboard', 'si' => 'උපකරණ තීරය'], lang());
 require_once __DIR__ . '/../includes/header.php';
 ?>
 <section class="bg-white p-6 rounded-xl shadow space-y-4">

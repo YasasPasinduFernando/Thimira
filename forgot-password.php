@@ -54,6 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $mainClass = 'flex min-h-[calc(100vh-10rem)] items-center justify-center py-4';
+$navBackHref = url('login.php') . '?' . http_build_query(['lang' => $appLang]);
+$navBackText = t(['en' => 'Back to login', 'si' => 'ඇතුල්වීමට ආපසු'], $appLang);
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white/95 p-8 shadow-card backdrop-blur-sm sm:p-10">

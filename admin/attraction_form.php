@@ -109,6 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $title = $isEdit ? 'Edit Attraction' : 'Add Attraction';
+$navBackHref = url('admin/attractions.php');
+$navBackText = t(['en' => 'Attractions list', 'si' => 'ස්ථාන ලැයිස්තුව'], lang());
 require_once __DIR__ . '/../includes/header.php';
 ?>
 <section class="bg-white p-6 rounded-xl shadow space-y-4">

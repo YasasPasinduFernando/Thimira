@@ -23,6 +23,8 @@ usort($rows, static fn(array $a, array $b): int => $a['distance_km'] <=> $b['dis
 $trip = array_slice(array_filter($rows, static fn(array $r): bool => $r['distance_km'] <= MAX_RADIUS_KM), 0, 4);
 
 $startTime = new DateTimeImmutable('08:00');
+$navBackHref = url('index.php') . '?' . http_build_query(['lang' => $appLang, 'lat' => $lat, 'lng' => $lng]);
+$navBackText = t(['en' => 'Home', 'si' => 'මුල් පිටුව'], $appLang);
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="surface-card border border-slate-100 p-6 md:p-8">

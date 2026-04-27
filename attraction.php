@@ -31,6 +31,8 @@ $navigateUrl = 'https://www.google.com/maps/dir/?api=1&origin=' . $lat . ',' . $
     . '&destination=' . $place['latitude'] . ',' . $place['longitude']
     . '&travelmode=driving';
 
+$navBackHref = url('attractions.php') . '?' . http_build_query(['lang' => $appLang, 'lat' => $lat, 'lng' => $lng]);
+$navBackText = t(['en' => 'Back to list', 'si' => 'ලැයිස්තුවට ආපසු'], $appLang);
 require_once __DIR__ . '/includes/header.php';
 ?>
 <article class="surface-card overflow-hidden border border-slate-100">
