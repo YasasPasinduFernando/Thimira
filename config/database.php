@@ -18,6 +18,8 @@ function db(): PDO
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
+        // Ensures Sinhala and emoji round-trip; some Windows/XAMPP stacks ignore DSN charset alone.
+        $pdo->exec('SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci');
     } catch (PDOException $e) {
         error_log('Village Traveler DB connection failed: ' . $e->getMessage());
         if (!headers_sent()) {

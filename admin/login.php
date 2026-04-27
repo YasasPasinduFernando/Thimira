@@ -22,8 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password_hash'])) {
-        $_SESSION['admin_id'] = (int) $user['id'];
-        $_SESSION['admin_username'] = $user['username'];
+        adopt_admin_session((int) $user['id'], (string) $user['username']);
         header('Location: ' . url('admin/dashboard.php'));
         exit;
     }

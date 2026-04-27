@@ -96,27 +96,29 @@ $tripNavHref = isUserLoggedIn()
                     <span class="sm:hidden">VT</span>
                 </a>
 
-                <nav class="flex flex-1 flex-wrap items-center justify-end gap-1 text-sm font-medium sm:gap-1.5" aria-label="Main">
+                <nav class="flex flex-1 flex-wrap items-center justify-end gap-1 text-sm font-medium sm:gap-1.5" aria-label="<?= esc(t(['en' => 'Main', 'si' => 'ප්‍රධාන'], $appLang)) ?>">
                     <a class="nav-link <?= $currentScript === 'index.php' ? 'nav-link-active' : '' ?>" href="<?= esc(url('index.php')) ?>?lang=<?= esc($appLang) ?>"><?= esc(t(['en' => 'Home', 'si' => 'මුල් පිටුව'], $appLang)) ?></a>
-                    <a class="nav-link <?= $currentScript === 'attractions.php' ? 'nav-link-active' : '' ?>" href="<?= $attractionsNavHref ?>"><?= esc(t(['en' => 'Attractions', 'si' => 'ස්ථාන'], $appLang)) ?><?php if (!isUserLoggedIn()): ?> <span class="text-[10px] font-normal opacity-70">(login)</span><?php endif; ?></a>
-                    <a class="nav-link <?= in_array($currentScript, ['trip.php', 'trip-create.php', 'trip-plan.php', 'my-trips.php'], true) ? 'nav-link-active' : '' ?>" href="<?= $tripNavHref ?>"><?= esc(t(['en' => 'One-Day Trip', 'si' => 'එක් දින චාරිකාව'], $appLang)) ?><?php if (!isUserLoggedIn()): ?> <span class="text-[10px] font-normal opacity-70">(login)</span><?php endif; ?></a>
+                    <a class="nav-link <?= $currentScript === 'attractions.php' ? 'nav-link-active' : '' ?>" href="<?= $attractionsNavHref ?>"><?= esc(t(['en' => 'Attractions', 'si' => 'ස්ථාන'], $appLang)) ?><?php if (!isUserLoggedIn()): ?> <span class="text-[10px] font-normal opacity-70"><?= esc(t(['en' => '(login)', 'si' => '(ඇතුල් වන්න)'], $appLang)) ?></span><?php endif; ?></a>
+                    <a class="nav-link <?= in_array($currentScript, ['trip.php', 'trip-create.php', 'trip-plan.php', 'my-trips.php'], true) ? 'nav-link-active' : '' ?>" href="<?= $tripNavHref ?>"><?= esc(t(['en' => 'One-Day Trip', 'si' => 'එක් දින චාරිකාව'], $appLang)) ?><?php if (!isUserLoggedIn()): ?> <span class="text-[10px] font-normal opacity-70"><?= esc(t(['en' => '(login)', 'si' => '(ඇතුල් වන්න)'], $appLang)) ?></span><?php endif; ?></a>
 
                     <?php if (isUserLoggedIn()): ?>
-                        <a class="nav-link <?= $currentScript === 'trip-create.php' ? 'nav-link-active' : '' ?>" href="<?= esc(url('trip-create.php')) ?>">Create Trip</a>
-                        <a class="nav-link <?= in_array($currentScript, ['my-trips.php', 'trip-plan.php'], true) ? 'nav-link-active' : '' ?>" href="<?= esc(url('my-trips.php')) ?>">My Trips</a>
+                        <a class="nav-link <?= $currentScript === 'trip-create.php' ? 'nav-link-active' : '' ?>" href="<?= esc(url('trip-create.php')) ?>"><?= esc(t(['en' => 'Create Trip', 'si' => 'සැලසුම සාදන්න'], $appLang)) ?></a>
+                        <a class="nav-link <?= in_array($currentScript, ['my-trips.php', 'trip-plan.php'], true) ? 'nav-link-active' : '' ?>" href="<?= esc(url('my-trips.php')) ?>"><?= esc(t(['en' => 'My Trips', 'si' => 'මගේ චාරිකා'], $appLang)) ?></a>
                     <?php endif; ?>
 
-                    <a class="nav-link opacity-80 hover:opacity-100" href="<?= esc(url('admin/login.php')) ?>"><?= esc(t(['en' => 'Admin', 'si' => 'පරිපාලක'], $appLang)) ?></a>
+                    <?php if (show_public_admin_nav()): ?>
+                        <a class="nav-link opacity-80 hover:opacity-100" href="<?= esc(url('admin/login.php')) ?>"><?= esc(t(['en' => 'Admin', 'si' => 'පරිපාලක'], $appLang)) ?></a>
+                    <?php endif; ?>
 
                     <span class="hidden h-5 w-px bg-white/15 sm:block" aria-hidden="true"></span>
 
-                    <div class="inline-flex rounded-xl bg-slate-800/90 p-1 ring-1 ring-white/10" role="group" aria-label="Language">
+                    <div class="inline-flex rounded-xl bg-slate-800/90 p-1 ring-1 ring-white/10" role="group" aria-label="<?= esc(t(['en' => 'Language', 'si' => 'භාෂාව'], $appLang)) ?>">
                         <a class="rounded-lg px-2.5 py-1 text-xs font-semibold transition <?= $appLang === 'en' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-white' ?>" href="<?= $enHref ?>">EN</a>
                         <a class="rounded-lg px-2.5 py-1 text-xs font-semibold transition <?= $appLang === 'si' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400 hover:text-white' ?>" href="<?= $siHref ?>">සිං</a>
                     </div>
 
                     <?php if (isUserLoggedIn()): ?>
-                        <span class="hidden items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200 sm:inline-flex" title="Signed in">
+                        <span class="hidden items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200 sm:inline-flex" title="<?= esc(t(['en' => 'Signed in', 'si' => 'ඇතුල් වී ඇත'], $appLang)) ?>">
                             <span class="h-1.5 w-1.5 rounded-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)]"></span>
                             <?= esc((string) ($_SESSION['user_username'] ?? 'User')) ?>
                         </span>

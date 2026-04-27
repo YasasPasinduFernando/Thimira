@@ -17,12 +17,12 @@ $place = $stmt->fetch();
 
 if (!$place) {
     http_response_code(404);
-    echo 'Attraction not found';
+    echo esc(t(['en' => 'Attraction not found', 'si' => 'ස්ථානය හමු නොවීය'], $appLang));
     exit;
 }
 
-$name = $appLang === 'si' ? $place['name_si'] : $place['name_en'];
-$description = $appLang === 'si' ? $place['description_si'] : $place['description_en'];
+$name = localized_text((string) $place['name_en'], (string) $place['name_si'], $appLang);
+$description = localized_text((string) $place['description_en'], (string) $place['description_si'], $appLang);
 $distance = distanceKm($lat, $lng, (float) $place['latitude'], (float) $place['longitude']);
 $minutes = max(5, (int) round(($distance / 30) * 60));
 $title = $name;
@@ -46,17 +46,17 @@ require_once __DIR__ . '/includes/header.php';
         <p class="mt-2 text-sm font-semibold uppercase tracking-wide text-village-600"><?= esc($place['category']) ?></p>
 
         <div class="mt-8 grid gap-3 sm:grid-cols-2">
-            <div class="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 p-4 text-sm"><span class="font-semibold text-slate-700">Distance</span><p class="mt-1 text-lg font-bold text-slate-900"><?= esc(number_format($distance, 2)) ?> km</p></div>
-            <div class="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 p-4 text-sm"><span class="font-semibold text-slate-700">Est. travel time</span><p class="mt-1 text-lg font-bold text-slate-900"><?= esc((string) $minutes) ?> min</p></div>
-            <div class="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 p-4 text-sm"><span class="font-semibold text-slate-700">Open hours</span><p class="mt-1 font-medium text-slate-900"><?= esc($place['open_hours']) ?></p></div>
-            <div class="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 p-4 text-sm"><span class="font-semibold text-slate-700">Entry fee</span><p class="mt-1 font-medium text-slate-900"><?= esc(money((float) $place['entry_fee_lkr'])) ?></p></div>
+            <div class="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 p-4 text-sm"><span class="font-semibold text-slate-700"><?= esc(t(['en' => 'Distance', 'si' => 'දුර'], $appLang)) ?></span><p class="mt-1 text-lg font-bold text-slate-900"><?= esc(number_format($distance, 2)) ?> km</p></div>
+            <div class="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 p-4 text-sm"><span class="font-semibold text-slate-700"><?= esc(t(['en' => 'Est. travel time', 'si' => 'ආසන්නම ගමන් කාලය'], $appLang)) ?></span><p class="mt-1 text-lg font-bold text-slate-900"><?= esc((string) $minutes) ?> <?= esc(t(['en' => 'min', 'si' => 'වි'], $appLang)) ?></p></div>
+            <div class="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 p-4 text-sm"><span class="font-semibold text-slate-700"><?= esc(t(['en' => 'Open hours', 'si' => 'විවෘත වේලාව'], $appLang)) ?></span><p class="mt-1 font-medium text-slate-900"><?= esc($place['open_hours']) ?></p></div>
+            <div class="rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-teal-50/40 p-4 text-sm"><span class="font-semibold text-slate-700"><?= esc(t(['en' => 'Entry fee', 'si' => 'ඇතුල්වීමේ ගාස්තුව'], $appLang)) ?></span><p class="mt-1 font-medium text-slate-900"><?= esc(money((float) $place['entry_fee_lkr'])) ?></p></div>
         </div>
 
         <p class="mt-8 text-base leading-relaxed text-slate-700"><?= esc($description) ?></p>
 
         <div class="mt-8 flex flex-wrap gap-3">
-            <a href="<?= esc($navigateUrl) ?>" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-2xl bg-village-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700">Navigate in Google Maps</a>
-            <a href="<?= esc(url('attractions.php')) ?>?lang=<?= esc($appLang) ?>&lat=<?= esc((string) $lat) ?>&lng=<?= esc((string) $lng) ?>" class="inline-flex rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-village-300">Back to list</a>
+            <a href="<?= esc($navigateUrl) ?>" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-2xl bg-village-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700"><?= esc(t(['en' => 'Navigate in Google Maps', 'si' => 'Google Maps හි මාර්ගොපදේශ'], $appLang)) ?></a>
+            <a href="<?= esc(url('attractions.php')) ?>?lang=<?= esc($appLang) ?>&lat=<?= esc((string) $lat) ?>&lng=<?= esc((string) $lng) ?>" class="inline-flex rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-village-300"><?= esc(t(['en' => 'Back to list', 'si' => 'ලැයිස්තුවට ආපසු'], $appLang)) ?></a>
         </div>
     </div>
 </article>

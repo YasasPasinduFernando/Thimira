@@ -6,7 +6,8 @@ require_once __DIR__ . '/includes/functions.php';
 
 requireUser();
 
-$title = 'Create Trip Plan';
+$appLang = lang();
+$title = t(['en' => 'Create Trip Plan', 'si' => 'චාරිකා සැලසුම සාදන්න'], $appLang);
 $currentUser = currentUser();
 $error = '';
 $planTitle = '';
@@ -20,9 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $selectedIds = array_values(array_filter(array_map('intval', (array) $selected), static fn(int $id): bool => $id > 0));
 
     if ($planTitle === '') {
-        $error = 'Trip title is required.';
+        $error = t(['en' => 'Trip title is required.', 'si' => 'චාරිකා මාතෘකාව අවශ්‍යයි.'], $appLang);
     } elseif (count($selectedIds) === 0) {
-        $error = 'Select at least one attraction.';
+        $error = t(['en' => 'Select at least one attraction.', 'si' => 'අවම වශයෙන් ස්ථානයක් තෝරන්න.'], $appLang);
     } else {
         db()->beginTransaction();
         try {
@@ -48,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         } catch (Throwable $e) {
             db()->rollBack();
-            $error = 'Could not create trip plan. Please try again.';
+            $error = t(['en' => 'Could not create trip plan. Please try again.', 'si' => 'චාරිකා සැලසුම සාදිය නොහැක. නැවත උත්සාහ කරන්න.'], $appLang);
         }
     }
 }
@@ -56,19 +57,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="surface-card mx-auto max-w-3xl border border-slate-100 p-6 md:p-10">
-    <h1 class="font-display text-2xl font-bold text-slate-900 md:text-3xl">Create your trip plan</h1>
-    <p class="mt-2 text-sm text-slate-600">Pick a title and select places in the order you plan to visit.</p>
+    <h1 class="font-display text-2xl font-bold text-slate-900 md:text-3xl"><?= esc(t(['en' => 'Create your trip plan', 'si' => 'ඔබේ චාරිකා සැලසුම සාදන්න'], $appLang)) ?></h1>
+    <p class="mt-2 text-sm text-slate-600"><?= esc(t([
+        'en' => 'Pick a title and select places in the order you plan to visit.',
+        'si' => 'මාතෘකාවක් තෝරා, ඔබ සංචාරය කිරීමට සැලසුම් කරන අනුපිළිවෙලට ස්ථාන තෝරන්න.',
+    ], $appLang)) ?></p>
     <?php if ($error): ?>
         <div class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><?= esc($error) ?></div>
     <?php endif; ?>
     <form method="post" class="mt-8 space-y-6">
         <div>
-            <label class="mb-1.5 block text-sm font-semibold text-slate-700">Trip title</label>
-            <input type="text" name="title" value="<?= esc($planTitle) ?>" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm" placeholder="My village weekend plan">
+            <label class="mb-1.5 block text-sm font-semibold text-slate-700"><?= esc(t(['en' => 'Trip title', 'si' => 'චාරිකා මාතෘකාව'], $appLang)) ?></label>
+            <input type="text" name="title" value="<?= esc($planTitle) ?>" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm" placeholder="<?= esc(t(['en' => 'My village weekend plan', 'si' => 'මගේ ගම්මාන සති අන්ත සැලසුම'], $appLang)) ?>">
         </div>
 
         <div>
-            <label class="mb-2 block text-sm font-semibold text-slate-700">Places to visit</label>
+            <label class="mb-2 block text-sm font-semibold text-slate-700"><?= esc(t(['en' => 'Places to visit', 'si' => 'බලා ගැනීමට ස්ථාන'], $appLang)) ?></label>
             <div class="grid max-h-80 gap-2 overflow-auto rounded-2xl border border-slate-200 bg-slate-50/50 p-4 md:grid-cols-2">
                 <?php foreach ($attractions as $place): ?>
                     <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-transparent bg-white p-3 text-sm shadow-sm transition hover:border-village-200 hover:shadow-soft">
@@ -79,7 +83,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
         </div>
 
-        <button type="submit" class="inline-flex rounded-2xl bg-slate-900 px-6 py-3 text-sm font-bold text-white shadow-soft transition hover:bg-slate-800">Create trip plan</button>
+        <button type="submit" class="inline-flex rounded-2xl bg-slate-900 px-6 py-3 text-sm font-bold text-white shadow-soft transition hover:bg-slate-800"><?= esc(t(['en' => 'Create trip plan', 'si' => 'චාරිකා සැලසුම සාදන්න'], $appLang)) ?></button>
     </form>
 </section>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

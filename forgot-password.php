@@ -6,7 +6,8 @@ require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/mailer.php';
 require_once __DIR__ . '/includes/email_layout.php';
 
-$title = 'Forgot Password';
+$appLang = lang();
+$title = t(['en' => 'Forgot Password', 'si' => 'මුරපදය අමතකද'], $appLang);
 $email = '';
 $message = '';
 $error = '';
@@ -15,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim((string) ($_POST['email'] ?? ''));
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Enter a valid email address.';
+        $error = t(['en' => 'Enter a valid email address.', 'si' => 'වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළත් කරන්න.'], $appLang);
     } else {
         $stmt = db()->prepare('SELECT id, username, email FROM users WHERE email = :email LIMIT 1');
         $stmt->execute(['email' => $email]);
@@ -48,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendAppEmail((string) $user['email'], $subject, $html, $text);
         }
 
-        $message = 'If an account exists for that email, a reset link has been sent.';
+        $message = t(['en' => 'If an account exists for that email, a reset link has been sent.', 'si' => 'එම විද්‍යුත් තැපෑලට ගිණුමක් තිබේ නම්, නැවත පිහිටුවීමේ සබැඳියක් යවන ලදී.'], $appLang);
     }
 }
 
@@ -56,8 +57,8 @@ $mainClass = 'flex min-h-[calc(100vh-10rem)] items-center justify-center py-4';
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white/95 p-8 shadow-card backdrop-blur-sm sm:p-10">
-    <h1 class="font-display text-2xl font-bold text-slate-900">Forgot password</h1>
-    <p class="mt-2 text-sm text-slate-600">We will email you a reset link if an account exists.</p>
+    <h1 class="font-display text-2xl font-bold text-slate-900"><?= esc(t(['en' => 'Forgot password', 'si' => 'මුරපදය අමතකද'], $appLang)) ?></h1>
+    <p class="mt-2 text-sm text-slate-600"><?= esc(t(['en' => 'We will email you a reset link if an account exists.', 'si' => 'ගිණුමක් තිබේ නම් නැවත පිහිටුවීමේ සබැඳිය විද්‍යුත් තැපෑලට යවමු.'], $appLang)) ?></p>
     <?php if ($error): ?>
         <div class="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><?= esc($error) ?></div>
     <?php endif; ?>
@@ -66,11 +67,11 @@ require_once __DIR__ . '/includes/header.php';
     <?php endif; ?>
     <form method="post" class="mt-6 space-y-5">
         <div>
-            <label class="mb-1.5 block text-sm font-semibold text-slate-700">Email</label>
+            <label class="mb-1.5 block text-sm font-semibold text-slate-700"><?= esc(t(['en' => 'Email', 'si' => 'විද්‍යුත් තැපෑල'], $appLang)) ?></label>
             <input type="email" name="email" value="<?= esc($email) ?>" required autocomplete="email" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm">
         </div>
-        <button type="submit" class="w-full rounded-2xl bg-slate-900 py-3.5 text-sm font-bold text-white shadow-soft transition hover:bg-slate-800">Send reset link</button>
+        <button type="submit" class="w-full rounded-2xl bg-slate-900 py-3.5 text-sm font-bold text-white shadow-soft transition hover:bg-slate-800"><?= esc(t(['en' => 'Send reset link', 'si' => 'නැවත පිහිටුවීමේ සබැඳිය යවන්න'], $appLang)) ?></button>
     </form>
-    <p class="mt-6 text-center text-sm text-slate-600">Back to <a class="font-semibold text-village-700 hover:underline" href="<?= esc(url('login.php')) ?>">Login</a></p>
+    <p class="mt-6 text-center text-sm text-slate-600"><?= esc(t(['en' => 'Back to', 'si' => 'ආපසු'], $appLang)) ?> <a class="font-semibold text-village-700 hover:underline" href="<?= esc(url('login.php')) ?>"><?= esc(t(['en' => 'Login', 'si' => 'ඇතුල් වන්න'], $appLang)) ?></a></p>
 </section>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

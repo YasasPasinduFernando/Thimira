@@ -64,6 +64,27 @@ function esc(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * Use Sinhala column when lang is "si" and text actually contains Indic script.
+ * If MySQL stored UTF-8 in a latin1 column, non-Latin characters become "?" — then we fall back to English.
+ */
+function localized_text(string $en, string $si, string $lang): string
+{
+    if ($lang !== 'si') {
+        return $en;
+    }
+    if ($si === '') {
+        return $en;
+    }
+    if (function_exists('mb_check_encoding') && !mb_check_encoding($si, 'UTF-8')) {
+        return $en;
+    }
+    if (!preg_match('/[\x{0D80}-\x{0DFF}\x{0B80}-\x{0BFF}]/u', $si)) {
+        return $en;
+    }
+    return $si;
+}
+
 function distanceKm(float $lat1, float $lng1, float $lat2, float $lng2): float
 {
     $earthRadius = 6371;
@@ -112,6 +133,40 @@ function getFlash(): ?array
     unset($_SESSION['flash']);
 
     return $flash;
+}
+
+/** Admin link on the public site: only for guests (logged-in users use the app, not admin). */
+function show_public_admin_nav(): bool
+{
+    return !isUserLoggedIn();
+}
+
+function adopt_frontend_user_session(int $userId, string $username): void
+{
+    unset($_SESSION['admin_id'], $_SESSION['admin_username']);
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
+    $_SESSION['user_id'] = $userId;
+    $_SESSION['user_username'] = $username;
+}
+
+function adopt_admin_session(int $adminId, string $adminUsername): void
+{
+    unset($_SESSION['user_id'], $_SESSION['user_username']);
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
+    $_SESSION['admin_id'] = $adminId;
+    $_SESSION['admin_username'] = $adminUsername;
+}
+
+function logout_frontend_user(): void
+{
+    unset($_SESSION['user_id'], $_SESSION['user_username']);
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
 }
 
 function isUserLoggedIn(): bool

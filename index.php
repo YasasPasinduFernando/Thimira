@@ -5,7 +5,7 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/functions.php';
 
 $appLang = lang();
-$title = 'Village Traveler - Home';
+$title = t(['en' => 'Village Traveler - Home', 'si' => 'Village Traveler - මුල් පිටුව'], $appLang);
 $isLoggedIn = isUserLoggedIn();
 $username = (string) ($_SESSION['user_username'] ?? '');
 
@@ -56,7 +56,7 @@ require_once __DIR__ . '/includes/header.php';
             </div>
             <div class="flex flex-wrap gap-2">
                 <a href="<?= esc(url('attractions.php')) ?>?lang=<?= esc($appLang) ?>" class="inline-flex rounded-xl bg-village-600 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700"><?= esc(t(['en' => 'Attractions', 'si' => 'ස්ථාන'], $appLang)) ?></a>
-                <a href="<?= esc(url('my-trips.php')) ?>" class="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-village-300 hover:text-village-800">My Trips</a>
+                <a href="<?= esc(url('my-trips.php')) ?>" class="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-village-300 hover:text-village-800"><?= esc(t(['en' => 'My Trips', 'si' => 'මගේ චාරිකා'], $appLang)) ?></a>
             </div>
         </div>
     </section>
@@ -66,17 +66,23 @@ require_once __DIR__ . '/includes/header.php';
             <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-village-400 to-village-600 text-white shadow-glow">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
             </div>
-            <h2 class="font-display text-xl font-bold text-slate-900">New here?</h2>
-            <p class="mt-2 text-sm leading-relaxed text-slate-600">Create an account to save trip plans, track visits, and get trip summary emails.</p>
-            <a href="<?= esc(url('register.php')) ?>" class="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800">Register</a>
+            <h2 class="font-display text-xl font-bold text-slate-900"><?= esc(t(['en' => 'New here?', 'si' => 'මෙහි අලුත්ද?'], $appLang)) ?></h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600"><?= esc(t([
+                'en' => 'Create an account to save trip plans, track visits, and get trip summary emails.',
+                'si' => 'චාරිකා සැලසුම් සුරැකීමට, සංචාර සටහන් කිරීමට, සහ සාරාංශ විද්‍යුත් තැපැල් ලබා ගැනීමට ගිණුමක් සාදන්න.',
+            ], $appLang)) ?></p>
+            <a href="<?= esc(url('register.php')) ?>" class="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"><?= esc(t(['en' => 'Register', 'si' => 'ලියාපදිංචි'], $appLang)) ?></a>
         </article>
         <article class="surface-card group border border-slate-100 p-8 transition hover:shadow-card">
             <div class="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-village-700 text-white shadow-soft">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
             </div>
-            <h2 class="font-display text-xl font-bold text-slate-900">Already have an account?</h2>
-            <p class="mt-2 text-sm leading-relaxed text-slate-600">Sign in to continue exploring attractions and managing your trips.</p>
-            <a href="<?= esc(url('login.php')) ?>" class="mt-6 inline-flex rounded-xl bg-village-600 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700">Login</a>
+            <h2 class="font-display text-xl font-bold text-slate-900"><?= esc(t(['en' => 'Already have an account?', 'si' => 'දැනටමත් ගිණුමක් තිබේද?'], $appLang)) ?></h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600"><?= esc(t([
+                'en' => 'Sign in to continue exploring attractions and managing your trips.',
+                'si' => 'ස්ථාන ගවේෂණය සහ චාරිකා කළමනාකරණය කරගෙන යාමට පිවිසෙන්න.',
+            ], $appLang)) ?></p>
+            <a href="<?= esc(url('login.php')) ?>" class="mt-6 inline-flex rounded-xl bg-village-600 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700"><?= esc(t(['en' => 'Login', 'si' => 'ඇතුල් වන්න'], $appLang)) ?></a>
         </article>
     </section>
 <?php endif; ?>
@@ -84,18 +90,27 @@ require_once __DIR__ . '/includes/header.php';
 <section class="grid gap-6 md:grid-cols-3">
     <article class="surface-card border border-slate-100 p-7 transition hover:-translate-y-0.5 hover:shadow-card">
         <div class="mb-4 text-2xl" aria-hidden="true">📍</div>
-        <h3 class="font-display text-lg font-bold text-slate-900">Location based</h3>
-        <p class="mt-2 text-sm leading-relaxed text-slate-600">Find attractions within a 25 km radius from live or default coordinates.</p>
+        <h3 class="font-display text-lg font-bold text-slate-900"><?= esc(t(['en' => 'Location based', 'si' => 'ස්ථානය මත පදනම්ව'], $appLang)) ?></h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600"><?= esc(t([
+            'en' => 'Find attractions within a 25 km radius from live or default coordinates.',
+            'si' => 'සජීවී හෝ පෙරනිමි ඛණ්ඩාංක වලින් කිලෝමීටර් 25 තුළ ස්ථාන සොයන්න.',
+        ], $appLang)) ?></p>
     </article>
     <article class="surface-card border border-slate-100 p-7 transition hover:-translate-y-0.5 hover:shadow-card">
         <div class="mb-4 text-2xl" aria-hidden="true">🌐</div>
-        <h3 class="font-display text-lg font-bold text-slate-900">Bilingual</h3>
-        <p class="mt-2 text-sm leading-relaxed text-slate-600">Switch English / Sinhala for comfortable reading on every page.</p>
+        <h3 class="font-display text-lg font-bold text-slate-900"><?= esc(t(['en' => 'Bilingual', 'si' => 'ද්වි භාෂා'], $appLang)) ?></h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600"><?= esc(t([
+            'en' => 'Switch English / Sinhala for comfortable reading on every page.',
+            'si' => 'සෑම පිටුවකම ඉංග්‍රීසි / සිංහල මාරු කර සුවපහසුවෙන් කියවන්න.',
+        ], $appLang)) ?></p>
     </article>
     <article class="surface-card border border-slate-100 p-7 transition hover:-translate-y-0.5 hover:shadow-card">
         <div class="mb-4 text-2xl" aria-hidden="true">🗺️</div>
-        <h3 class="font-display text-lg font-bold text-slate-900">Trip planner</h3>
-        <p class="mt-2 text-sm leading-relaxed text-slate-600">Auto-build a one-day route with map view and Google Maps directions.</p>
+        <h3 class="font-display text-lg font-bold text-slate-900"><?= esc(t(['en' => 'Trip planner', 'si' => 'චාරිකා සැලසුම්කරු'], $appLang)) ?></h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600"><?= esc(t([
+            'en' => 'Auto-build a one-day route with map view and Google Maps directions.',
+            'si' => 'සිතියම් දර්ශනය සහ Google Maps යොමු සමඟ ස්වයංක්‍රීය එක් දින මාර්ගයක් සාදන්න.',
+        ], $appLang)) ?></p>
     </article>
 </section>
 

@@ -15,6 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = db()->prepare('UPDATE attractions SET is_active = :active WHERE id = :id');
         $stmt->execute(['active' => $value, 'id' => $id]);
         setFlash('success', $action === 'activate' ? 'Attraction activated.' : 'Attraction deactivated.');
+    } elseif ($id > 0 && $action === 'delete') {
+        $stmt = db()->prepare('DELETE FROM attractions WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+        setFlash('success', 'Attraction deleted permanently.');
     }
 
     header('Location: ' . url('admin/attractions.php'));
@@ -114,7 +118,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <td class="p-2"><?= (int) $row['is_active'] === 1 ? 'Active' : 'Inactive' ?></td>
                         <td class="p-2">
                             <a href="<?= esc(url('admin/attraction_form.php')) ?>?id=<?= (int) $row['id'] ?>" class="text-blue-700 hover:underline">Edit</a>
-                            <form method="post" class="inline" onsubmit="return confirm('Confirm action?')">
+                            <form method="post" class="inline" onsubmit="return confirm('Change status for this attraction?')">
                                 <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
                                 <?php if ((int) $row['is_active'] === 1): ?>
                                     <input type="hidden" name="action" value="deactivate">
@@ -123,6 +127,11 @@ require_once __DIR__ . '/../includes/header.php';
                                     <input type="hidden" name="action" value="activate">
                                     <button type="submit" class="text-emerald-700 hover:underline ml-3">Activate</button>
                                 <?php endif; ?>
+                            </form>
+                            <form method="post" class="inline" onsubmit="return confirm('Permanently delete this attraction? Trip plans that reference it will lose those stops. This cannot be undone.')">
+                                <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
+                                <input type="hidden" name="action" value="delete">
+                                <button type="submit" class="text-slate-600 hover:text-red-700 hover:underline ml-3 font-medium">Delete</button>
                             </form>
                         </td>
                     </tr>

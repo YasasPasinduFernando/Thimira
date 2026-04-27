@@ -9,7 +9,7 @@ require_login_for_discovery_pages();
 
 $lat = currentLat();
 $lng = currentLng();
-$title = t(['en' => 'Attractions Near You', 'si' => 'Attractions Near You'], $appLang);
+$title = t(['en' => 'Attractions Near You', 'si' => 'ඔබට ආසන්න ස්ථාන'], $appLang);
 
 $stmt = db()->query('SELECT * FROM attractions WHERE is_active = 1');
 $rows = $stmt->fetchAll();
@@ -29,29 +29,31 @@ require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="hero-gradient relative mb-8 overflow-hidden rounded-3xl p-6 text-white md:p-10">
     <h1 class="font-display text-2xl font-bold md:text-4xl"><?= esc($title) ?></h1>
-    <p class="mt-3 max-w-xl text-slate-200">Discover places within 25 km of your location.</p>
+    <p class="mt-3 max-w-xl text-slate-200"><?= esc(t([
+        'en' => 'Discover places within 25 km of the reference location.',
+        'si' => 'යොමු ස්ථානයෙන් කිලෝමීටර් 25 තුළ ස්ථාන සොයා ගන්න.',
+    ], $appLang)) ?></p>
     <div class="mt-6 flex flex-wrap gap-3">
-        <button type="button" id="use-my-location" class="inline-flex items-center rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-5 py-3 text-sm font-bold text-slate-900 shadow-lg shadow-amber-500/20 transition hover:from-amber-300 hover:to-amber-400">Use My Live Location</button>
-        <a href="https://maps.app.goo.gl/XpPW8HxJxcbdj1Zj6" target="_blank" rel="noopener noreferrer" class="inline-flex items-center rounded-2xl border border-white/25 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur-sm transition hover:bg-white/20">Open Given Location</a>
+        <a href="https://maps.app.goo.gl/XpPW8HxJxcbdj1Zj6" target="_blank" rel="noopener noreferrer" class="inline-flex items-center rounded-2xl border border-white/25 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur-sm transition hover:bg-white/20"><?= esc(t(['en' => 'Open reference on Maps', 'si' => 'සිතියමේ යොමුව අරින්න'], $appLang)) ?></a>
     </div>
 </section>
 
 <section class="grid gap-8 md:grid-cols-2">
     <div class="surface-card border border-slate-100 p-5 md:p-6">
-        <h2 class="font-display text-lg font-bold text-slate-900">Map view</h2>
+        <h2 class="font-display text-lg font-bold text-slate-900"><?= esc(t(['en' => 'Map view', 'si' => 'සිතියම් දර්ශනය'], $appLang)) ?></h2>
         <div id="map" class="mt-4"></div>
-        <p class="mt-4 text-sm text-slate-500">Reference: <span class="font-mono text-slate-700"><?= esc(number_format($lat, 6)) ?>, <?= esc(number_format($lng, 6)) ?></span></p>
+        <p class="mt-4 text-sm text-slate-500"><?= esc(t(['en' => 'Reference:', 'si' => 'යොමුව:'], $appLang)) ?> <span class="font-mono text-slate-700"><?= esc(number_format($lat, 6)) ?>, <?= esc(number_format($lng, 6)) ?></span></p>
     </div>
 
     <div class="space-y-4">
         <?php if (!$attractions): ?>
-            <div class="surface-card border border-dashed border-slate-200 p-8 text-center text-slate-600">No attractions found within 25 km.</div>
+            <div class="surface-card border border-dashed border-slate-200 p-8 text-center text-slate-600"><?= esc(t(['en' => 'No attractions found within 25 km.', 'si' => 'කිලෝමීටර් 25 තුළ ස්ථාන නොමැත.'], $appLang)) ?></div>
         <?php endif; ?>
 
         <?php foreach ($attractions as $place): ?>
             <?php
-                $name = $appLang === 'si' ? $place['name_si'] : $place['name_en'];
-                $short = $appLang === 'si' ? $place['short_si'] : $place['short_en'];
+                $name = localized_text((string) $place['name_en'], (string) $place['name_si'], $appLang);
+                $short = localized_text((string) $place['short_en'], (string) $place['short_si'], $appLang);
                 $distance = number_format((float) $place['distance_km'], 2);
             ?>
             <article class="surface-card group border border-slate-100 p-5 transition hover:shadow-card">
@@ -63,7 +65,7 @@ require_once __DIR__ . '/includes/header.php';
                     <span class="shrink-0 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800"><?= esc($distance) ?> km</span>
                 </div>
                 <p class="mt-3 text-sm leading-relaxed text-slate-600"><?= esc($short) ?></p>
-                <a class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-village-700 transition group-hover:gap-2 hover:text-village-900" href="<?= esc(url('attraction.php')) ?>?id=<?= (int) $place['id'] ?>&lang=<?= esc($appLang) ?>&lat=<?= esc((string) $lat) ?>&lng=<?= esc((string) $lng) ?>">View details <span aria-hidden="true">→</span></a>
+                <a class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-village-700 transition group-hover:gap-2 hover:text-village-900" href="<?= esc(url('attraction.php')) ?>?id=<?= (int) $place['id'] ?>&lang=<?= esc($appLang) ?>&lat=<?= esc((string) $lat) ?>&lng=<?= esc((string) $lng) ?>"><?= esc(t(['en' => 'View details', 'si' => 'විස්තර බලන්න'], $appLang)) ?> <span aria-hidden="true">→</span></a>
             </article>
         <?php endforeach; ?>
     </div>
@@ -90,15 +92,19 @@ require_once __DIR__ . '/includes/header.php';
         shadowSize: [41, 41]
     });
 
-    L.marker([homeLat, homeLng], { icon: redIcon }).addTo(map).bindPopup('Home Location (Red Pin)');
+    const labelHomeRef = <?= json_encode(t(['en' => 'Home reference (red pin)', 'si' => 'නිවස යොමුව (රතු ඇණ)'], $appLang), JSON_UNESCAPED_UNICODE) ?>;
+    const labelRefLoc = <?= json_encode(t(['en' => 'Reference location', 'si' => 'යොමු ස්ථානය'], $appLang), JSON_UNESCAPED_UNICODE) ?>;
+    const labelDetails = <?= json_encode(t(['en' => 'Details', 'si' => 'විස්තර'], $appLang), JSON_UNESCAPED_UNICODE) ?>;
+
+    L.marker([homeLat, homeLng], { icon: redIcon }).addTo(map).bindPopup(labelHomeRef);
 
     if (Math.abs(currentLat - homeLat) > 0.00001 || Math.abs(currentLng - homeLng) > 0.00001) {
-        L.marker([currentLat, currentLng]).addTo(map).bindPopup('Your Current Location');
+        L.marker([currentLat, currentLng]).addTo(map).bindPopup(labelRefLoc);
     }
 
     const attractions = <?= json_encode(array_map(static function (array $row) use ($appLang): array {
         return [
-            'name' => $appLang === 'si' ? $row['name_si'] : $row['name_en'],
+            'name' => localized_text((string) $row['name_en'], (string) $row['name_si'], $appLang),
             'lat' => (float) $row['latitude'],
             'lng' => (float) $row['longitude'],
             'id' => (int) $row['id'],
@@ -107,7 +113,7 @@ require_once __DIR__ . '/includes/header.php';
 
     attractions.forEach((item) => {
         L.marker([item.lat, item.lng]).addTo(map)
-            .bindPopup(`<strong>${item.name}</strong><br><a href="<?= esc(url('attraction.php')) ?>?id=${item.id}&lang=<?= esc($appLang) ?>&lat=<?= esc((string) $lat) ?>&lng=<?= esc((string) $lng) ?>">Details</a>`);
+            .bindPopup(`<strong>${item.name}</strong><br><a href="<?= esc(url('attraction.php')) ?>?id=${item.id}&lang=<?= esc($appLang) ?>&lat=<?= esc((string) $lat) ?>&lng=<?= esc((string) $lng) ?>">${labelDetails}</a>`);
     });
 </script>
 

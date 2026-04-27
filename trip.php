@@ -9,7 +9,7 @@ require_login_for_discovery_pages();
 
 $lat = currentLat();
 $lng = currentLng();
-$title = 'One-Day Trip Planner';
+$title = t(['en' => 'One-Day Trip Planner', 'si' => 'එක් දින චාරිකා සැලසුම්කරු'], $appLang);
 
 $stmt = db()->query('SELECT * FROM attractions WHERE is_active = 1');
 $rows = $stmt->fetchAll();
@@ -29,35 +29,36 @@ require_once __DIR__ . '/includes/header.php';
     <div class="mb-6 flex flex-col gap-4 border-b border-slate-100 pb-6 md:flex-row md:items-end md:justify-between">
         <div>
             <h1 class="font-display text-2xl font-bold text-slate-900 md:text-3xl"><?= esc($title) ?></h1>
-            <p class="mt-2 max-w-xl text-sm text-slate-600">Auto-generated route using the nearest attractions from your current location.</p>
+            <p class="mt-2 max-w-xl text-sm text-slate-600"><?= esc(t([
+                'en' => 'Auto-generated route using the nearest attractions from the reference location.',
+                'si' => 'යොමු ස්ථානයෙන් ආසන්නතම ස්ථාන භාවිතයෙන් ස්වයංක්‍රීයව සාදන ලද මාර්ගයකි.',
+            ], $appLang)) ?></p>
         </div>
         <?php if (isUserLoggedIn()): ?>
             <div class="flex flex-wrap gap-2">
-                <a href="<?= esc(url('trip-create.php')) ?>" class="inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-slate-800">Personal trip plan</a>
-                <a href="<?= esc(url('my-trips.php')) ?>" class="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-village-300">My trips</a>
+                <a href="<?= esc(url('trip-create.php')) ?>" class="inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-slate-800"><?= esc(t(['en' => 'Personal trip plan', 'si' => 'පුද්ගලික චාරිකා සැලසුම'], $appLang)) ?></a>
+                <a href="<?= esc(url('my-trips.php')) ?>" class="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-village-300"><?= esc(t(['en' => 'My trips', 'si' => 'මගේ චාරිකා'], $appLang)) ?></a>
             </div>
         <?php endif; ?>
     </div>
 
-    <button type="button" id="use-my-location" class="mb-6 inline-flex rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-5 py-3 text-sm font-bold text-slate-900 shadow-lg shadow-amber-500/20 transition hover:from-amber-300 hover:to-amber-400">Rebuild using my live location</button>
-
     <?php if (!$trip): ?>
-        <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 p-8 text-center text-slate-600">No route available within a 25 km radius.</div>
+        <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 p-8 text-center text-slate-600"><?= esc(t(['en' => 'No route available within a 25 km radius.', 'si' => 'කිලෝමීටර් 25 වටසන තුළ මාර්ගයක් නොමැත.'], $appLang)) ?></div>
     <?php else: ?>
         <div class="overflow-hidden rounded-2xl border border-slate-200 shadow-soft">
             <table class="min-w-full text-sm">
                 <thead class="bg-gradient-to-r from-slate-50 to-teal-50/50">
                     <tr>
                         <th class="p-4 text-left font-display font-semibold text-slate-700">#</th>
-                        <th class="p-4 text-left font-display font-semibold text-slate-700">Place</th>
-                        <th class="p-4 text-left font-display font-semibold text-slate-700">Distance</th>
-                        <th class="p-4 text-left font-display font-semibold text-slate-700">Arrival</th>
+                        <th class="p-4 text-left font-display font-semibold text-slate-700"><?= esc(t(['en' => 'Place', 'si' => 'ස්ථානය'], $appLang)) ?></th>
+                        <th class="p-4 text-left font-display font-semibold text-slate-700"><?= esc(t(['en' => 'Distance', 'si' => 'දුර'], $appLang)) ?></th>
+                        <th class="p-4 text-left font-display font-semibold text-slate-700"><?= esc(t(['en' => 'Arrival', 'si' => 'පැමිණීම'], $appLang)) ?></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">
                     <?php foreach ($trip as $i => $stop): ?>
                         <?php
-                            $name = $appLang === 'si' ? $stop['name_si'] : $stop['name_en'];
+                            $name = localized_text((string) $stop['name_en'], (string) $stop['name_si'], $appLang);
                             $arrival = $startTime->modify('+' . (string) ($i * 90) . ' minutes')->format('H:i');
                         ?>
                         <tr class="transition hover:bg-teal-50/30">
@@ -73,7 +74,7 @@ require_once __DIR__ . '/includes/header.php';
 
         <div id="map" class="mt-6"></div>
 
-        <a class="mt-6 inline-flex items-center gap-2 rounded-2xl bg-village-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&origin=<?= esc((string) $lat) ?>,<?= esc((string) $lng) ?>&destination=<?= esc((string) $trip[count($trip)-1]['latitude']) ?>,<?= esc((string) $trip[count($trip)-1]['longitude']) ?>&travelmode=driving">Open route in Google Maps</a>
+        <a class="mt-6 inline-flex items-center gap-2 rounded-2xl bg-village-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/dir/?api=1&origin=<?= esc((string) $lat) ?>,<?= esc((string) $lng) ?>&destination=<?= esc((string) $trip[count($trip)-1]['latitude']) ?>,<?= esc((string) $trip[count($trip)-1]['longitude']) ?>&travelmode=driving"><?= esc(t(['en' => 'Open route in Google Maps', 'si' => 'Google Maps හි මාර්ගය අරින්න'], $appLang)) ?></a>
 
         <script>
             const map = L.map('map').setView([<?= esc((string) $lat) ?>, <?= esc((string) $lng) ?>], 11);
@@ -83,11 +84,12 @@ require_once __DIR__ . '/includes/header.php';
             }).addTo(map);
 
             const routePoints = [[<?= esc((string) $lat) ?>, <?= esc((string) $lng) ?>]];
-            L.marker([<?= esc((string) $lat) ?>, <?= esc((string) $lng) ?>]).addTo(map).bindPopup('Start');
+            const labelStart = <?= json_encode(t(['en' => 'Start', 'si' => 'ආරම්භය'], $appLang), JSON_UNESCAPED_UNICODE) ?>;
+            L.marker([<?= esc((string) $lat) ?>, <?= esc((string) $lng) ?>]).addTo(map).bindPopup(labelStart);
 
             const tripStops = <?= json_encode(array_map(static function (array $item) use ($appLang): array {
                 return [
-                    'name' => $appLang === 'si' ? $item['name_si'] : $item['name_en'],
+                    'name' => localized_text((string) $item['name_en'], (string) $item['name_si'], $appLang),
                     'lat' => (float) $item['latitude'],
                     'lng' => (float) $item['longitude'],
                 ];

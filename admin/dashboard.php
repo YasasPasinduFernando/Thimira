@@ -47,6 +47,8 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="mt-8 flex flex-wrap gap-2">
+            <a href="<?= esc(url('admin/users.php')) ?>" class="inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-slate-800">Manage users</a>
+            <a href="<?= esc(url('admin/user_form.php')) ?>" class="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-soft transition hover:border-village-300">Add user</a>
             <a href="<?= esc(url('admin/attractions.php')) ?>" class="inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-slate-800">Manage attractions</a>
             <a href="<?= esc(url('admin/attraction_form.php')) ?>" class="inline-flex rounded-xl bg-village-600 px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-village-700">Add attraction</a>
             <a href="<?= esc(url('index.php')) ?>" target="_blank" rel="noopener noreferrer" class="inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-village-300">View public site</a>
